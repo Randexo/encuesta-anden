@@ -258,6 +258,7 @@
             <option>Cusco</option>
             <option>Otra ciudad</option>
           </select>
+          <input id="ciudad-otra" type="text" placeholder="¿Cuál ciudad?" style="display:none; margin-top:10px">
         </div>
 
         <div id="distrito-group" style="display:none">
@@ -429,14 +430,24 @@
 
 <script>
 function toggleDistrito(ciudad) {
-  const distritoGroup  = document.getElementById('distrito-group');
-  const dondeGroup     = document.getElementById('donde-lavas-group');
+  const distritoGroup = document.getElementById('distrito-group');
+  const dondeGroup    = document.getElementById('donde-lavas-group');
+  const otraInput     = document.getElementById('ciudad-otra');
   if (ciudad === 'Lima') {
     distritoGroup.style.display = '';
     dondeGroup.classList.remove('full-width');
+    otraInput.style.display = 'none';
+    otraInput.value = '';
+  } else if (ciudad === 'Otra ciudad') {
+    distritoGroup.style.display = 'none';
+    dondeGroup.classList.add('full-width');
+    otraInput.style.display = '';
+    document.getElementById('distrito').value = '';
   } else {
     distritoGroup.style.display = 'none';
     dondeGroup.classList.add('full-width');
+    otraInput.style.display = 'none';
+    otraInput.value = '';
     document.getElementById('distrito').value = '';
   }
 }
@@ -444,7 +455,9 @@ function toggleDistrito(ciudad) {
 async function submitForm(event){
   event.preventDefault();
 
-  const ciudad      = document.getElementById('ciudad').value;
+  const ciudadSel   = document.getElementById('ciudad').value;
+  const ciudadOtra  = document.getElementById('ciudad-otra').value.trim();
+  const ciudad      = ciudadSel === 'Otra ciudad' ? ciudadOtra : ciudadSel;
   const distrito    = document.getElementById('distrito').value;
   const donde_lavas = document.getElementById('donde_lavas').value;
   const interior    = document.getElementById('interior').value;
@@ -456,8 +469,9 @@ async function submitForm(event){
   const aspirado    = document.getElementById('aspirado').value;
   const contacto    = document.getElementById('celular').value.trim();
 
-  const distritoRequerido = ciudad === 'Lima' && !distrito;
-  if(!ciudad || distritoRequerido || !donde_lavas || !interior || !frecuencia || !perfil || !preferencia || !interes || !precio || !aspirado){
+  const distritoRequerido = ciudadSel === 'Lima' && !distrito;
+  const otraCiudadRequerida = ciudadSel === 'Otra ciudad' && !ciudadOtra;
+  if(!ciudadSel || distritoRequerido || otraCiudadRequerida || !donde_lavas || !interior || !frecuencia || !perfil || !preferencia || !interes || !precio || !aspirado){
     alert('Completa todas las preguntas para enviar tu opinión.');
     return false;
   }
